@@ -21,22 +21,22 @@ int		ft_move(t_data *data)
 	if (data->left == 1 && data->player.x > 0)
 	{
 		data->player.x -= 1;
-		printf("x = %d, y= %d\n", data->player.x, data->player.y);
+		//printf("x = %d, y= %d\n", data->player.x, data->player.y);
 	}
 	if (data->right == 1 && data->player.x < data->width / 2 - data->size_x / 2)
 	{
     	data->player.x += 1;
-    	printf("x = %d, y= %d\n", data->player.x, data->player.y);
+    	//printf("x = %d, y= %d\n", data->player.x, data->player.y);
 	}
 	if (data->up == 1 && data->player.y > 0)
 	{
 		data->player.y -= 1;
-		printf("x = %d, y= %d\n", data->player.x, data->player.y);
+		//printf("x = %d, y= %d\n", data->player.x, data->player.y);
 	}
 	if (data->down == 1 && data->player.y < data->height / 2 - data->size_y / 2)
 	{
 		data->player.y += 1;
-		printf("x = %d, y= %d\n", data->player.x, data->player.y);
+		//printf("x = %d, y= %d\n", data->player.x, data->player.y);
 	}
 	if (arr[data->player.x][data->player.y] == 1 && data->score > 0)
 	{
@@ -52,22 +52,22 @@ int		ft_move_2(t_data *data)
 	if (data->left2 == 1 && data->player_2.x > 0)
 	{
 		data->player_2.x -= 1;
-		printf("x = %d, y= %d\n", data->player_2.x, data->player_2.y);
+		//printf("x = %d, y= %d\n", data->player_2.x, data->player_2.y);
 	}
 	if (data->right2 == 1 && data->player_2.x < data->width / 2 - data->size_x / 2)
 	{
     	data->player_2.x += 1;
-    	printf("x = %d, y= %d\n", data->player_2.x, data->player_2.y);
+    	//printf("x = %d, y= %d\n", data->player_2.x, data->player_2.y);
 	}
 	if (data->up2 == 1 && data->player_2.y > 0)
 	{
 		data->player_2.y -= 1;
-		printf("x = %d, y= %d\n", data->player_2.x, data->player_2.y);
+		//printf("x = %d, y= %d\n", data->player_2.x, data->player_2.y);
 	}
 	if (data->down2 == 1 && data->player_2.y < data->height / 2 - data->size_y / 2)
 	{
 		data->player_2.y += 1;
-		printf("x = %d, y= %d\n", data->player_2.x, data->player_2.y);
+		//printf("x = %d, y= %d\n", data->player_2.x, data->player_2.y);
 	}
 	if (arr[data->player_2.x][data->player_2.y] == 1 && data->score > 0)
 	{
