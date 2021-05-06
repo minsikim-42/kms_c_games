@@ -5,6 +5,8 @@
 mlx폴더에 깃클론을 해주세요.
 please install files in mlx folder.
 
+ 또는 a.out파일을 실행시켜도 됩니다.
+
 1. you can compile with `gcc -lmlx -framework OpenGL -framework Appkit pixel_worm_game2.c`
 2. and press comends `./a.out` to start game.
 3. press any key.
@@ -12,6 +14,8 @@ please install files in mlx folder.
 - 이 게임은 2인용 서바이벌 게임입니다. 각자의 키를 눌러(키에서 손을 떼지 마세요!!) 선에 부딪히지 않고 오래 살아남으세요!!
 - this game is survivor game. 2player press key(Keep your hands off the key!!) and dont crash to line(both you and me).
 - listen. Dont leave key!!
+- 파란 박스가 나타날 때부터 충돌체크됩니다.
+- when blue box appeared crash will be checked. 
 
 ### player left
 - up : 'w'
