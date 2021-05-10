@@ -5,6 +5,8 @@
 #include <math.h>
 #include <time.h>
 
+// gcc -lmlx -framework OpenGL -framework Appkit pixel_shooting_game.c
+
 char	arr[16001][10001]; // until 1600 * 1000
 
 typedef struct	s_player
