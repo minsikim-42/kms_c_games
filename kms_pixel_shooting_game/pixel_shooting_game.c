@@ -309,11 +309,11 @@ void	moving(t_data *data, t_player *player)
 
 
 	//printf("x, y = %d, %d\n", (int)player->x, (int)player->y);
-	for (int i = 0; i < 100; i++)
+	for (int i = 0; i < 200; i++)
 	{
-		for (int j = 0; j < 100; j++)
+		for (int j = 0; j < 200; j++)
 		{
-			if (arr[(int)(player->x * 10) - 50 + i][(int)(player->y * 10) - 50 + j] == player->num)
+			if (arr[(int)(player->x * 10) - 100 + i][(int)(player->y * 10) - 100 + j] == player->num)
 			{
 				printf("player%d(%s) win!\n", player->num, player->charic);
 				clear(data);
@@ -396,7 +396,7 @@ void	draw(t_data data, t_player player, int ga, int color)
 	{
 		for (int j = 0; j < ga; j++)
 		{
-			my_mlx_pixel_put(&data, x + i - 10, y + j - 10, color);
+			my_mlx_pixel_put(&data, x + i - ga / 2, y + j - ga / 2, color);
 		}
 	}
 	for (int i = 0; i < 4; i++) // aim
@@ -412,9 +412,9 @@ void	draw(t_data data, t_player player, int ga, int color)
 void	blink(t_data *data)
 {
 	if (data->player.shoot == 0 && data->player.shooted == 1)
-		draw(*data, data->player, 20, 0x00FF0000);
+		draw(*data, data->player, 14, 0x00FF0000);
 	if (data->player2.shoot == 0 && data->player2.shooted == 1)
-		draw(*data, data->player2, 20, 0x00FF0000);
+		draw(*data, data->player2, 14, 0x00FF0000);
 }
 
 int		loop_ft(t_data *data)
@@ -424,9 +424,11 @@ int		loop_ft(t_data *data)
 
 	stage(*data);
 	moving(data, &data->player);
-	draw(*data, data->player, 20, data->player.color);
+	draw(*data, data->player, 20, data->player.color); // outside
+	draw(*data, data->player, 12, 0xAFFF40FF); // hack
 	moving(data, &data->player2);
-	draw(*data, data->player2, 20, data->player2.color);
+	draw(*data, data->player2, 20, data->player2.color); // outside
+	draw(*data, data->player2, 12, 0x00EFEF00); // hack
 	blink(data);
 	if (data->player.shoot == 1 && data->player.shooted == 0)
 	{
@@ -492,7 +494,7 @@ void	dataset(t_data *data)
 	data->player2.vec_y = 0;
 
 	data->player.color = 0x00FFFF80;
-	data->player2.color = 0x008080FF;
+	data->player2.color = 0x00905FFF;
 	data->player.shooted = 0;
 	data->player2.shooted = 0;
 	data->player.shoot = 0;
