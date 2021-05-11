@@ -7,7 +7,7 @@
 
 // gcc -lmlx -framework OpenGL -framework Appkit pixel_shooting_game.c
 
-char	arr[16001][10001]; // until 1600 * 1000
+char	arr[8001][5001]; // until 1600 * 1000
 
 typedef struct	s_player
 {
@@ -23,6 +23,7 @@ typedef struct	s_player
 	int		count;
 	int		color;
 	char	*charic;
+	int		hack;
 
 	int		shoot;
 	int		shooted;
@@ -76,6 +77,17 @@ void    my_mlx_pixel_put(t_data *data, int x, int y, int color)
     char	*dst;
 
 	dst = data->addr + (y * data->line_length + x * (data->bits_per_pixel / 8));
+	*(unsigned int*)dst = color;
+}
+
+void    vec_mlx_pixel_put(t_data *data, t_player *player, int i, int j, int color)
+{
+    char	*dst;
+	float	x = player->x;
+	float	y = player->y;
+
+	dst = data->addr + ((int)(y + i * player->vec_y + j * sin(player->theta + M_PI_2)) * data->line_length
+		+ (int)(x + i * player->vec_x + j * cos(player->theta + M_PI_2)) * (data->bits_per_pixel / 8));
 	*(unsigned int*)dst = color;
 }
 
@@ -194,32 +206,97 @@ int		ft_shooted(t_data data, t_player *bullet)
 	return (1);
 }
 
-// void	shooting(t_data data, t_player *player)
-// {
-// 	float	x = player->x;
-// 	float	y = player->y;
 
-// 	while (0 < x && x < data.width && 0 < y && y < data.height)
-// 	{
-// 		x += player->vec_x * data.move_speed;
-// 		y += player->vec_y * data.move_speed;
-// 		for (int i = 0; i < 14; i++) // remove
-// 		{
-// 			for (int j = 0; j < 14; j++)
-// 			{
-// 				my_mlx_pixel_put(&data, x + i - 7, y + j - 7, 0x0000000);
-// 			}
-// 		}
-// 		for (int i = 0; i < 10; i++)
-// 		{
-// 			for (int j = 0; j < 10; j++)
-// 			{
-// 				my_mlx_pixel_put(&data, x + i - 5, y + j - 5, 0x00FF000);
-// 			}
-// 		}
-// 		mlx_put_image_to_window(data.mlx, data.win, data.img, 0, 0);
-// 	}
-// }
+void	draw_aim(t_data data, t_player player)
+{
+	float x = player.x;
+	float y = player.y;
+
+	for (int i = 0; i < 30; i++)
+	{
+		for (int j = 0; j < 10; j++) // test aim
+		{
+			vec_mlx_pixel_put(&data, &player, data.aim + i - 40, data.aim + j - 40, player.hack);
+		}
+	}
+	for (int i = 0; i < 4; i++) // aim
+	{
+		for (int j = 0; j < 4; j++)
+		{
+			my_mlx_pixel_put(&data, x + player.vec_x * data.aim + i - 2, y + player.vec_y * data.aim + j - 2, 0x00FF0000);
+		}
+	}
+	for (int i = 0; i < 4; i++) // little aim2
+	{
+		for (int j = 0; j < 4; j++)
+		{
+			my_mlx_pixel_put(&data, x + player.vec_x * (data.aim - 6) + i - 2, y + player.vec_y * (data.aim - 6) + j - 2, 0x00FF0000);
+		}
+	}
+	for (int i = 0; i < 4; i++) // little aim2
+	{
+		for (int j = 0; j < 4; j++)
+		{
+			my_mlx_pixel_put(&data, x + player.vec_x * (data.aim - 8) + i - 2, y + player.vec_y * (data.aim - 8) + j - 2, 0x00FF0000);
+		}
+	}
+}
+
+void	remove_pix(t_data *data, t_player *player)
+{
+	int x = player->x;
+	int y = player->y;
+	
+	for (int i = 0; i < 22; i++) // remove
+	{
+		for (int j = 0; j < 22; j++)
+		{
+			my_mlx_pixel_put(data, x + i - 11, y + j - 11, 0x00000000);
+		}
+	}
+	for (int i = 0; i < 30; i++)
+	{
+		for (int j = 0; j < 10; j++) // test aim
+		{
+			vec_mlx_pixel_put(data, player, data->aim + i - 40, data->aim + j - 40, 0x00000000);
+		}
+	}
+	for (int i = 0; i < 6; i++) // remove aim
+	{
+		for (int j = 0; j < 6; j++)
+		{
+			my_mlx_pixel_put(data, x + player->vec_x * data->aim + i - 3, y + player->vec_y * data->aim + j - 3, 0x00000000);
+		}
+	}
+	for (int i = 0; i < 6; i++) // remove aim2
+	{
+		for (int j = 0; j < 6; j++)
+		{
+			my_mlx_pixel_put(data, x + player->vec_x * (data->aim - 6) + i - 3, y + player->vec_y * (data->aim - 6) + j - 3, 0x00000000);
+		}
+	}
+	for (int i = 0; i < 6; i++) // remove aim2
+	{
+		for (int j = 0; j < 6; j++)
+		{
+			my_mlx_pixel_put(data, x + player->vec_x * (data->aim - 8) + i - 3, y + player->vec_y * (data->aim - 8) + j - 3, 0x00000000);
+		}
+	}
+	// for (int i = 0; i < 4; i++) // remove aim
+	// {
+	// 	for (int j = 0; j < 4; j++)
+	// 	{
+	// 		my_mlx_pixel_put(data, x + player->vec_x * data->aim + i - 2, y + player->vec_y * data->aim + j - 2, 0x00000000);
+	// 	}
+	// }
+	// for (int i = 0; i < 4; i++) // remove aim2
+	// {
+	// 	for (int j = 0; j < 4; j++)
+	// 	{
+	// 		my_mlx_pixel_put(data, x + player->vec_x * (data->aim - 8) + i - 2, y + player->vec_y * (data->aim - 8) + j - 2, 0x00000000);
+	// 	}
+	// }
+}
 
 int		tracing(int keycode, t_data *data)
 {
@@ -297,13 +374,21 @@ void	moving(t_data *data, t_player *player)
 
 	int x = player->x;
 	int y = player->y;
-	for (int i = 0; i < 6; i++) // remove aim
-		{
-			for (int j = 0; j < 6; j++)
-			{
-				my_mlx_pixel_put(data, x + player->vec_x * data->aim + i - 3, y + player->vec_y * data->aim + j - 3, 0x00000000);
-			}
-		}
+	remove_pix(data, player);
+	// for (int i = 0; i < 6; i++) // remove aim
+	// {
+	// 	for (int j = 0; j < 6; j++)
+	// 	{
+	// 		my_mlx_pixel_put(data, x + player->vec_x * data->aim + i - 3, y + player->vec_y * data->aim + j - 3, 0x00000000);
+	// 	}
+	// }
+	// for (int i = 0; i < 6; i++) // remove aim2
+	// 	{
+	// 		for (int j = 0; j < 6; j++)
+	// 		{
+	// 			my_mlx_pixel_put(data, x + player->vec_x * (data->aim - 8) + i - 3, y + player->vec_y * (data->aim - 8) + j - 3, 0x00000000);
+	// 		}
+	// 	}
 	player->vec_x = cos(player->theta);
 	player->vec_y = sin(player->theta);
 
@@ -335,57 +420,17 @@ void	moving(t_data *data, t_player *player)
 	}
 	if (player->up == 1)
 	{
-		for (int i = 0; i < 20; i++) // remove
-		{
-			for (int j = 0; j < 20; j++)
-			{
-				my_mlx_pixel_put(data, x + i - 10, y + j - 10, 0x00000000);
-			}
-		}
-		for (int i = 0; i < 4; i++) // remove aim
-		{
-			for (int j = 0; j < 4; j++)
-			{
-				my_mlx_pixel_put(data, x + player->vec_x * data->aim + i - 2, y + player->vec_y * data->aim + j - 2, 0x00000000);
-			}
-		}
+		remove_pix(data, player);
 		player->x += player->vec_x * data->move_speed;
 		player->y += player->vec_y * data->move_speed;
 	}
 	if (player->down == 1 && player->y < data->height - 30)
 	{
-		for (int i = 0; i < 20; i++) // remove
-		{
-			for (int j = 0; j < 20; j++)
-			{
-				my_mlx_pixel_put(data, x + i - 10, y + j - 10, 0x00000000);
-			}
-		}
-		for (int i = 0; i < 4; i++) // remove aim
-		{
-			for (int j = 0; j < 4; j++)
-			{
-				my_mlx_pixel_put(data, x + player->vec_x * data->aim + i - 2, y + player->vec_y * data->aim + j - 2, 0x00000000);
-			}
-		}
+		remove_pix(data, player);
 		player->x -= player->vec_x * data->move_speed;
 		player->y -= player->vec_y * data->move_speed;
 	}
 }
-
-// void	draw(t_data *data)
-// {
-// 	int x = data->x;
-// 	int y = data->y;
-// 	for (int i = 0; i < 30; i++)
-// 	{
-// 		for (int j = 0; j < 30; j++)
-// 		{
-// 			my_mlx_pixel_put(data, x, y, 0x00FFFF00);
-// 		}
-// 	}
-// 	mlx_put_image_to_window(data->mlx, data->win, data->img, 0, 0);
-// }
 
 void	draw(t_data data, t_player player, int ga, int color)
 {
@@ -399,22 +444,17 @@ void	draw(t_data data, t_player player, int ga, int color)
 			my_mlx_pixel_put(&data, x + i - ga / 2, y + j - ga / 2, color);
 		}
 	}
-	for (int i = 0; i < 4; i++) // aim
-	{
-		for (int j = 0; j < 4; j++)
-		{
-			my_mlx_pixel_put(&data, x + player.vec_x * data.aim + i - 2, y + player.vec_y * data.aim + j - 2, 0x00FF0000);
-		}
-	}
+	draw_aim(data, player);
+	
 	mlx_put_image_to_window(data.mlx, data.win, data.img, 0, 0);
 }
 
 void	blink(t_data *data)
 {
 	if (data->player.shoot == 0 && data->player.shooted == 1)
-		draw(*data, data->player, 14, 0x00FF0000);
+		draw(*data, data->player, 16, 0x00FF0000);
 	if (data->player2.shoot == 0 && data->player2.shooted == 1)
-		draw(*data, data->player2, 14, 0x00FF0000);
+		draw(*data, data->player2, 16, 0x00FF0000);
 }
 
 int		loop_ft(t_data *data)
@@ -424,10 +464,10 @@ int		loop_ft(t_data *data)
 
 	stage(*data);
 	moving(data, &data->player);
-	draw(*data, data->player, 20, data->player.color); // outside
+	draw(*data, data->player, 22, data->player.color); // outside
 	draw(*data, data->player, 12, 0xAFFF40FF); // hack
 	moving(data, &data->player2);
-	draw(*data, data->player2, 20, data->player2.color); // outside
+	draw(*data, data->player2, 22, data->player2.color); // outside
 	draw(*data, data->player2, 12, 0x00EFEF00); // hack
 	blink(data);
 	if (data->player.shoot == 1 && data->player.shooted == 0)
@@ -495,6 +535,8 @@ void	dataset(t_data *data)
 
 	data->player.color = 0x00FFFF80;
 	data->player2.color = 0x00905FFF;
+	data->player.hack = 0xAFFF40FF;
+	data->player2.hack = 0x00EFEF00;
 	data->player.shooted = 0;
 	data->player2.shooted = 0;
 	data->player.shoot = 0;
@@ -507,10 +549,10 @@ void	dataset(t_data *data)
 	data->player.charic = "left";
 	data->player2.charic = "right";
 
-	data->aim = 50;
+	data->aim = 35;
 	data->move_speed = 2;
-	data->bullet_speed = 8;
-	data->rotate_speed = 0.05;
+	data->bullet_speed = 9;
+	data->rotate_speed = 0.07;
 	data->width = 800;
 	data->height = 500;
 	data->bullet.count = 0;
