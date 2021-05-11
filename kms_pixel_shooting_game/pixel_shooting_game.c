@@ -22,6 +22,7 @@ typedef struct	s_player
 	int		num;
 	int		count;
 	int		color;
+	char	*charic;
 
 	int		shoot;
 	int		shooted;
@@ -120,6 +121,34 @@ void	clear(t_data *data)
 	data->player2.vec_y = 0;
 }
 
+void	line_out(t_data *data, t_player player)
+{
+	if ((int)(player.x * 10) < 500)
+	{
+		printf("player%d(%s) win!\n", player.num, player.charic);
+		clear(data);
+		return ;
+	}
+	if ((int)(player.x * 10) > data->width * 10 - 500)
+	{
+		printf("player%d(%s) win!\n", player.num, player.charic);
+		clear(data);
+		return ;
+	}
+	if ((int)(player.y * 10) < 500)
+	{
+		printf("player%d(%s) win!\n", player.num, player.charic);
+		clear(data);
+		return ;
+	}
+	if ((int)(player.y * 10) > data->height * 10 - 500)
+	{
+		printf("player%d(%s) win!\n", player.num, player.charic);
+		clear(data);
+		return ;
+	}
+}
+
 void	shooting(t_data data, t_player *player, t_player *bullet)
 {
 	bullet->x = player->x;
@@ -194,7 +223,7 @@ int		ft_shooted(t_data data, t_player *bullet)
 
 int		tracing(int keycode, t_data *data)
 {
-	printf("%d\n", keycode);
+	//printf("%d\n", keycode);
 
 	if (keycode == 126)
 		data->player.up = 1;
@@ -264,6 +293,8 @@ int		release(int keycode, t_data *data)
 
 void	moving(t_data *data, t_player *player)
 {
+	line_out(data, *player);
+
 	int x = player->x;
 	int y = player->y;
 	for (int i = 0; i < 6; i++) // remove aim
@@ -284,7 +315,7 @@ void	moving(t_data *data, t_player *player)
 		{
 			if (arr[(int)(player->x * 10) - 50 + i][(int)(player->y * 10) - 50 + j] == player->num)
 			{
-				printf("player%d win!", player->num);
+				printf("player%d(%s) win!\n", player->num, player->charic);
 				clear(data);
 			}
 		}
@@ -293,13 +324,13 @@ void	moving(t_data *data, t_player *player)
 	if (player->left == 1)
 	{
 		player->theta -= data->rotate_speed;
-		printf("x, y = (%f, %f)\n", player->vec_x, player->vec_y);
+		//printf("x, y = (%f, %f)\n", player->vec_x, player->vec_y);
 		//data->x -= 1;
 	}
 	if (player->right == 1)
 	{
 		player->theta += data->rotate_speed;
-		printf("x, y = (%f, %f)\n", player->vec_x, player->vec_y);
+		//printf("x, y = (%f, %f)\n", player->vec_x, player->vec_y);
 		//data->player->x += 1;
 	}
 	if (player->up == 1)
@@ -356,16 +387,16 @@ void	moving(t_data *data, t_player *player)
 // 	mlx_put_image_to_window(data->mlx, data->win, data->img, 0, 0);
 // }
 
-void	draw(t_data data, t_player player)
+void	draw(t_data data, t_player player, int ga, int color)
 {
 	float x = player.x;
 	float y = player.y;
 
-	for (int i = 0; i < 20; i++)
+	for (int i = 0; i < ga; i++)
 	{
-		for (int j = 0; j < 20; j++)
+		for (int j = 0; j < ga; j++)
 		{
-			my_mlx_pixel_put(&data, x + i - 10, y + j - 10, player.color);
+			my_mlx_pixel_put(&data, x + i - 10, y + j - 10, color);
 		}
 	}
 	for (int i = 0; i < 4; i++) // aim
@@ -378,6 +409,14 @@ void	draw(t_data data, t_player player)
 	mlx_put_image_to_window(data.mlx, data.win, data.img, 0, 0);
 }
 
+void	blink(t_data *data)
+{
+	if (data->player.shoot == 0 && data->player.shooted == 1)
+		draw(*data, data->player, 20, 0x00FF0000);
+	if (data->player2.shoot == 0 && data->player2.shooted == 1)
+		draw(*data, data->player2, 20, 0x00FF0000);
+}
+
 int		loop_ft(t_data *data)
 {
 	int		i;
@@ -385,12 +424,13 @@ int		loop_ft(t_data *data)
 
 	stage(*data);
 	moving(data, &data->player);
-	draw(*data, data->player);
+	draw(*data, data->player, 20, data->player.color);
 	moving(data, &data->player2);
-	draw(*data, data->player2);
+	draw(*data, data->player2, 20, data->player2.color);
+	blink(data);
 	if (data->player.shoot == 1 && data->player.shooted == 0)
 	{
-		printf("p: %d, %d // b: %d, %d\n", (int)data->player.x, (int)data->player.y, (int)data->bullet.x, (int)data->bullet.y);
+		//printf("p: %d, %d // b: %d, %d\n", (int)data->player.x, (int)data->player.y, (int)data->bullet.x, (int)data->bullet.y);
 		data->bullet.count += 1;
 		printf("shooting!\n");
 		shooting(*data, &data->player, &data->bullet);
@@ -462,6 +502,8 @@ void	dataset(t_data *data)
 	data->player2.num = 1;
 	data->bullet.num = 1;
 	data->bullet2.num = 2;
+	data->player.charic = "left";
+	data->player2.charic = "right";
 
 	data->aim = 50;
 	data->move_speed = 2;
