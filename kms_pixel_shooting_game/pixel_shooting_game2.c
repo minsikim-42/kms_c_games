@@ -67,6 +67,7 @@ typedef struct	s_data {
 	int		now;
 	int		onetwo;
 	int		clear;
+	float	hp;
 
 	t_player	player;
 	t_player	player2;
@@ -491,9 +492,11 @@ void	moving(t_data *data, t_player *player)
 	{
 		for (int j = (-1) * hit_ga / 2; j < hit_ga / 2; j++)
 		{
+			if (i % 2 == 1 || j % 2 == 1)
+				break;
 			if (arr[(int)(player->x * 10) + i][(int)(player->y * 10) + j] == player->num)
 			{
-				player->HP--;
+				player->HP -= 1.5;
 				player->pcolor = data->hitted;
 				//printf("player%d(%s) win!\n", player->num, player->charic);
 				//clear(data);
@@ -502,7 +505,7 @@ void	moving(t_data *data, t_player *player)
 			{
 				if (player->HP <= 999.5)
 				{
-					player->HP += 0.1;
+					player->HP += 0.07;
 				}
 				data->hill.count++;
 				//printf("%d\n", data->hill.count);
@@ -512,7 +515,7 @@ void	moving(t_data *data, t_player *player)
 			}
 			else if (arr[(int)(player->x * 10) + i][(int)(player->y * 10) + j] == 4)
 			{
-				player->HP -= 1;
+				player->HP -= 0.3;
 				player->pcolor = 0xAFFF0000;
 				//printf("player%d(%s) win!\n", player->num, player->charic);
 				//clear(data);
@@ -565,11 +568,11 @@ void	draw_HP(t_data data, t_player player)
 		{
 			for (int j = 0; j < 14; j++)
 			{
-				if (player.HP >= 999)
+				if (player.HP >= data.hp - 1)
 					my_mlx_pixel_put(&data, x + i - 3, y + j - 24, green);
-				else if (player.HP < 999 && player.HP >= 200)
+				else if (player.HP < data.hp - 1 && player.HP >= data.hp / 5)
 					my_mlx_pixel_put(&data, x + i - 3, y + j - 24, joo);
-				else if (player.HP < 200)
+				else if (player.HP < data.hp / 5)
 					my_mlx_pixel_put(&data, x + i - 3, y + j - 24, red);
 			}
 		}
@@ -616,7 +619,7 @@ void	draw_hack(t_data *data, t_player *player, int ga, int color)
 	}
 }
 
-void	draw_goorm(t_data data)
+void	remove_goorm(t_data *data)
 {
 	int ga = 50;
 	for (int i = (-1) * ga; i < ga; i++) // circle
@@ -624,14 +627,14 @@ void	draw_goorm(t_data data)
 		for (int j = (-1) * ga; j < ga; j++)
 		{
 			if ((i * i) + (j * j) <= ga * ga)
-				my_mlx_pixel_put(&data, i + data.width / 9 * 5, j + data.height / 7 * 4, 0x00A3CEDC);
+				my_mlx_pixel_put(data, i + data->width / 9 * 5, j + data->height / 7 * 4, 0x0);
 		}
 	}
 	for(int i = -30; i < 30; i++)
 	{
 		for(int j = -100; j < 100; j++)
 		{
-			my_mlx_pixel_put(&data, i + data.width / 2, j + data.height / 2, 0x008FBAC8);
+			my_mlx_pixel_put(data, i + data->width / 2, j + data->height / 2, 0x0);
 			//arr[i * 10 + 2500][j * 10 + 1000] = player->num;
 		}
 	}
@@ -640,7 +643,7 @@ void	draw_goorm(t_data data)
 		for (int j = (-1) * ga; j < ga; j++)
 		{
 			if ((i * i) + (j * j) <= ga * ga)
-				my_mlx_pixel_put(&data, i + data.width / 9 * 4, j + data.height / 7 * 3, 0x00ADD8E6);
+				my_mlx_pixel_put(data, i + data->width / 9 * 4, j + data->height / 7 * 3, 0x0);
 		}
 	}
 	for (int i = (-1) * ga; i < ga; i++) // circle
@@ -648,7 +651,7 @@ void	draw_goorm(t_data data)
 		for (int j = (-1) * ga; j < ga; j++)
 		{
 			if ((i * i) + (j * j) <= ga * ga)
-				my_mlx_pixel_put(&data, i + data.width / 7 * 3, j + data.height / 9 * 5, 0x00D4FFFF);
+				my_mlx_pixel_put(data, i + data->width / 7 * 3, j + data->height / 9 * 5, 0x0);
 		}
 	}
 	for (int i = (-1) * ga; i < ga; i++) // circle
@@ -656,12 +659,57 @@ void	draw_goorm(t_data data)
 		for (int j = (-1) * ga; j < ga; j++)
 		{
 			if ((i * i) + (j * j) <= ga * ga)
-				my_mlx_pixel_put(&data, i + data.width / 7 * 4, j + data.height / 9 * 4, 0x00EEFFFF);
+				my_mlx_pixel_put(data, i + data->width / 7 * 4, j + data->height / 9 * 4, 0x0);
 		}
 	}
 }
 
-void	draw(t_data data, t_player *player, int color)
+void	draw_goorm(t_data *data)
+{
+	int ga = 50;
+	for (int i = (-1) * ga; i < ga; i++) // circle
+	{
+		for (int j = (-1) * ga; j < ga; j++)
+		{
+			if ((i * i) + (j * j) <= ga * ga)
+				my_mlx_pixel_put(data, i + data->width / 9 * 5, j + data->height / 7 * 4, 0xFBA3CEDC);
+		}
+	}
+	for(int i = -30; i < 30; i++)
+	{
+		for(int j = -100; j < 100; j++)
+		{
+			my_mlx_pixel_put(data, i + data->width / 2, j + data->height / 2, 0xFB8FBAC8);
+			//arr[i * 10 + 2500][j * 10 + 1000] = player->num;
+		}
+	}
+	for (int i = (-1) * ga; i < ga; i++) // circle
+	{
+		for (int j = (-1) * ga; j < ga; j++)
+		{
+			if ((i * i) + (j * j) <= ga * ga)
+				my_mlx_pixel_put(data, i + data->width / 9 * 4, j + data->height / 7 * 3, 0xFBADD8E6);
+		}
+	}
+	for (int i = (-1) * ga; i < ga; i++) // circle
+	{
+		for (int j = (-1) * ga; j < ga; j++)
+		{
+			if ((i * i) + (j * j) <= ga * ga)
+				my_mlx_pixel_put(data, i + data->width / 7 * 3, j + data->height / 9 * 5, 0xFBD4FFFF);
+		}
+	}
+	for (int i = (-1) * ga; i < ga; i++) // circle
+	{
+		for (int j = (-1) * ga; j < ga; j++)
+		{
+			if ((i * i) + (j * j) <= ga * ga)
+				my_mlx_pixel_put(data, i + data->width / 7 * 4, j + data->height / 9 * 4, 0xFBEEFFFF);
+		}
+	}
+}
+
+void	draw(t_data *data, t_player *player, int color)
 {
 	float x = player->x;
 	float y = player->y;
@@ -674,12 +722,13 @@ void	draw(t_data data, t_player *player, int color)
 	// 			my_mlx_pixel_put(&data, x + i, y + j, color);
 	// 	}
 	// }
+	remove_goorm(data);
 	for (int i = -28; i < 28; i++) // ->
 	{
 		for (int j = -7; j < 7; j++)
 		{
 			if (i < j * 4 && i < j * (-4))
-				vec_mlx_pixel_put(&data, player, i + 42, j, player->pcolor);
+				vec_mlx_pixel_put(data, player, i + 42, j, player->pcolor);
 		}
 	}
 	for (int i = 0; i < 10; i++) // fly
@@ -687,7 +736,7 @@ void	draw(t_data data, t_player *player, int color)
 		for (int j = 0; j < 30; j++)
 		{
 			if (j < i * (-3) + 30)
-				vec_mlx_pixel_put(&data, player, i, j, player->pcolor);
+				vec_mlx_pixel_put(data, player, i, j, player->pcolor);
 		}
 	}
 	for (int i = 0; i < 10; i++) // fly
@@ -695,7 +744,7 @@ void	draw(t_data data, t_player *player, int color)
 		for (int j = -30; j < 0; j++)
 		{
 			if (j > i * (3) - 30)
-				vec_mlx_pixel_put(&data, player, i, j, player->pcolor);
+				vec_mlx_pixel_put(data, player, i, j, player->pcolor);
 		}
 	}
 	for (int i = 0; i < 5; i++) // fly2
@@ -703,7 +752,7 @@ void	draw(t_data data, t_player *player, int color)
 		for (int j = 0; j < 15; j++)
 		{
 			if (j < i * (-3) + 15)
-				vec_mlx_pixel_put(&data, player, i - 15, j + 5, player->pcolor);
+				vec_mlx_pixel_put(data, player, i - 15, j + 5, player->pcolor);
 		}
 		//vec_mlx_pixel_put(&data, player, -16, 6, player->pcolor);
 	}
@@ -712,9 +761,9 @@ void	draw(t_data data, t_player *player, int color)
 		for (int j = -15; j < 0; j++)
 		{
 			if (j > i * (3) - 15)
-				vec_mlx_pixel_put(&data, player, i - 15, j - 5, player->pcolor);
+				vec_mlx_pixel_put(data, player, i - 15, j - 5, player->pcolor);
 		}
-		vec_mlx_pixel_put(&data, player, -16, 0, player->pcolor);
+		//vec_mlx_pixel_put(&data, player, -16, 0, player->pcolor);
 	}
 	// for (int i = -15; i < 15; i++)
 	// {
@@ -723,12 +772,12 @@ void	draw(t_data data, t_player *player, int color)
 	// 		vec_mlx_pixel_put(&data, player, i , j, player->pcolor);
 	// 	}
 	// }
-	draw_aim(data, *player);
-	draw_HP(data, *player);
-	draw_hack(&data, player, 18, 0x0064D897);
+	draw_aim(*data, *player);
+	draw_HP(*data, *player);
+	draw_hack(data, player, 18, 0x0064D897);
 	draw_goorm(data);
 	
-	mlx_put_image_to_window(data.mlx, data.win, data.img, 0, 0);
+	mlx_put_image_to_window(data->mlx, data->win, data->img, 0, 0);
 }
 
 void	blink(t_data data)
@@ -898,9 +947,9 @@ int		loop_ft(t_data *data)
 	//GetAsyncKeyState(data->player.left);
 	stage(*data);
 	moving(data, &data->player);
-	draw(*data, &data->player, data->player.pcolor); // outside
+	draw(data, &data->player, data->player.pcolor); // outside
 	moving(data, &data->player2);
-	draw(*data, &data->player2, data->player2.pcolor); // outside
+	draw(data, &data->player2, data->player2.pcolor); // outside
 	draw_things(data);
 	blink(*data);
 
@@ -919,14 +968,14 @@ int		loop_ft(t_data *data)
 	if (rand() % 20 > 18 && data->item == 0) // item
 	{
 		data->onetwo = rand() % 2;
-		data->now = data->frame + 800 - data->frame / 25;
+		data->now = data->frame + 800 - data->frame / 20;
 		data->item = 1;
 		if (data->onetwo == 1)
 			drop_item_ready(data);
 		else
 			drop_bomb_ready(data);
 	}
-	if (data->now < data->frame + 400 - data->frame / 50 && data->item != 0)
+	if (data->now < data->frame + 400 - data->frame / 40 && data->item != 0)
 	{
 		if (data->onetwo == 1)
 			drop_item(data);
@@ -1031,8 +1080,10 @@ void	dataset(t_data *data)
 	data->bullet2.num = 2;
 	data->player.charic = "left";
 	data->player2.charic = "right";
-	data->player.HP = 1000;
-	data->player2.HP = 1000;
+
+	data->hp = 1000;
+	data->player.HP = data->hp;
+	data->player2.HP = data->hp;
 
 	data->item = 0;
 	data->frame = 0;
