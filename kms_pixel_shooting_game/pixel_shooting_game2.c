@@ -62,6 +62,7 @@ typedef struct	s_data {
 	int		height;
 	int		hitted;
 	unsigned long	frame;
+	unsigned		color_frame;
 	int		item;
 	int		now;
 	int		onetwo;
@@ -338,13 +339,13 @@ void	remove_pix(t_data *data, t_player *player)
 				vec_mlx_pixel_put(data, player, i - 15, j - 5, 0);
 		}
 	}
-	for (int i = -15; i < 15; i++)
-	{
-		for (int j = -6; j < 6; j++)
-		{
-			vec_mlx_pixel_put(data, player, i , j, 0);
-		}
-	}
+	// for (int i = -15; i < 15; i++)
+	// {
+	// 	for (int j = -6; j < 6; j++)
+	// 	{
+	// 		vec_mlx_pixel_put(data, player, i , j, 0);
+	// 	}
+	// }
 	int k = 0;
 	while (k < player->HP / 200 + 1) // remove HP
 	{
@@ -497,18 +498,19 @@ void	moving(t_data *data, t_player *player)
 				//printf("player%d(%s) win!\n", player->num, player->charic);
 				//clear(data);
 			}
-			if (arr[(int)(player->x * 10) + i][(int)(player->y * 10) + j] == 3)
+			else if (arr[(int)(player->x * 10) + i][(int)(player->y * 10) + j] == 3)
 			{
 				if (player->HP <= 999.5)
 				{
 					player->HP += 0.1;
 				}
 				data->hill.count++;
+				//printf("%d\n", data->hill.count);
 				player->pcolor = 0xAF00FF00;
 				//printf("player%d(%s) win!\n", player->num, player->charic);
 				//clear(data);
 			}
-			if (arr[(int)(player->x * 10) + i][(int)(player->y * 10) + j] == 4)
+			else if (arr[(int)(player->x * 10) + i][(int)(player->y * 10) + j] == 4)
 			{
 				player->HP -= 1;
 				player->pcolor = 0xAFFF0000;
@@ -703,7 +705,7 @@ void	draw(t_data data, t_player *player, int color)
 			if (j < i * (-3) + 15)
 				vec_mlx_pixel_put(&data, player, i - 15, j + 5, player->pcolor);
 		}
-		vec_mlx_pixel_put(&data, player, -16, 6, player->pcolor);
+		//vec_mlx_pixel_put(&data, player, -16, 6, player->pcolor);
 	}
 	for (int i = 0; i < 5; i++) // fly2
 	{
@@ -712,15 +714,15 @@ void	draw(t_data data, t_player *player, int color)
 			if (j > i * (3) - 15)
 				vec_mlx_pixel_put(&data, player, i - 15, j - 5, player->pcolor);
 		}
-		vec_mlx_pixel_put(&data, player, -16, -6, player->pcolor);
+		vec_mlx_pixel_put(&data, player, -16, 0, player->pcolor);
 	}
-	for (int i = -15; i < 15; i++)
-	{
-		for (int j = -6; j < 6; j++)
-		{
-			vec_mlx_pixel_put(&data, player, i , j, player->pcolor);
-		}
-	}
+	// for (int i = -15; i < 15; i++)
+	// {
+	// 	for (int j = -6; j < 6; j++)
+	// 	{
+	// 		vec_mlx_pixel_put(&data, player, i , j, player->pcolor);
+	// 	}
+	// }
 	draw_aim(data, *player);
 	draw_HP(data, *player);
 	draw_hack(&data, player, 18, 0x0064D897);
@@ -788,7 +790,7 @@ void	drop_bomb_ready(t_data *data)
 	{
 		for (int j = (-1) * ga; j < ga; j++)
 		{
-			if ((i * i) + (j * j) <= ga * ga && (i * i) + (j * j) >= ga * ga - 40)
+			if ((i * i) + (j * j) <= ga * ga && (i * i) + (j * j) >= ga * ga - 200)
 			{
 				my_mlx_pixel_put(data, i + 200 + random_x, j + 200 + random_y, 0x00FF0000);
 			}
@@ -808,7 +810,7 @@ void	drop_item(t_data *data)
 		{
 			if ((i * i) + (j * j) <= ga * ga)
 			{
-				if (data->hill.count > 3000)
+				if (data->hill.count > 5000)
 				{
 					my_mlx_pixel_put(data, i + 200 + random_x, j + 200 + random_y, 0x0);
 					arr[i * 10 + 2000 + random_x * 10][j * 10 + 2000 + random_y * 10] = 0;
@@ -851,6 +853,13 @@ void	hitted(t_data *data)
 			data->player2.frame = data->frame + 20;
 			data->player2.hitted = 1;
 		}
+		if (data->player2.frame < data->frame && data->player2.hitted == 0)
+		{
+			data->player2.pcolor = data->player2.color;
+			data->player2.hitted = 0;
+		}
+		if (data->item == 0)
+			data->player2.frame = data->frame + 20;
 		if (data->player2.frame < data->frame)
 		{
 			data->player2.pcolor = data->player2.color;
@@ -865,6 +874,13 @@ void	hitted(t_data *data)
 			data->player.hitted = 1;
 		}
 		if (data->player.frame < data->frame)
+		{
+			data->player.pcolor = data->player.color;
+			data->player.hitted = 0;
+		}
+		if (data->item == 0)
+			data->player.frame = data->frame + 20;
+		if (data->player.frame < data->frame && data->item == 0)
 		{
 			data->player.pcolor = data->player.color;
 			data->player.hitted = 0;
@@ -902,22 +918,22 @@ int		loop_ft(t_data *data)
 
 	if (rand() % 20 > 18 && data->item == 0) // item
 	{
-		data->now = data->frame + 700;
-		data->item = 1;
 		data->onetwo = rand() % 2;
+		data->now = data->frame + 800 - data->frame / 25;
+		data->item = 1;
 		if (data->onetwo == 1)
 			drop_item_ready(data);
 		else
 			drop_bomb_ready(data);
 	}
-	if (data->now < data->frame + 400 && data->item != 0)
+	if (data->now < data->frame + 400 - data->frame / 50 && data->item != 0)
 	{
 		if (data->onetwo == 1)
 			drop_item(data);
 		else
 			drop_bomb(data);
 	}
-	if ((data->now < data->frame || data->hill.count > 3000 || data->frame == 0) && data->item == 1)
+	if ((data->now < data->frame || data->hill.count > 5000 || data->frame == 0) && data->item == 1)
 	{
 		if (data->onetwo == 1)
 		{
