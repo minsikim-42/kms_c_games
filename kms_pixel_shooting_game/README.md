@@ -5,9 +5,9 @@ please git clone, and you can play before `chmod 777 shooting_start_v0.42(virsio
 you can play only Mac!
 
 - P1 Key
-right: d
-left: a
-shoot: shift
+\nright: d
+\nleft: a
+\nshoot: shift
 
 - p2 Key
 right: right key
