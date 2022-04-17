@@ -1,102 +1,5 @@
 
-#include "mlx.h"
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <time.h>
-#include <pthread.h>
-
-// gcc -lmlx -framework OpenGL -framework Appkit pixel_shooting_game.c
-
-char	arr[16001][10001]; // until 1600 * 1000
-
-typedef struct	s_item
-{
-	int		x;
-	int		y;
-	int		ga;
-	int		count;
-}				t_item;
-
-typedef struct	s_player
-{
-	float	oldx;
-	float	oldy;
-	float	x;
-	float	y;
-	int		up;
-	int		down;
-	int		left;
-	int		right;
-	int		num;
-	int		count;
-	int		color;
-	int		pcolor;
-	char	*charic;
-	int		hack;
-	int		hitted;
-
-	float	HP;
-	int		shoot;
-	int		shooted;
-	int		lose_count;
-	int		frame;
-
-	float	vec_x;
-	float	vec_y;
-	float	theta;
-	float	move_speed;
-}				t_player;
-
-
-typedef struct	s_data {
-	void	*mlx;
-	void	*win;
-
-	void	*img;
-	char	*addr;
-	int		bits_per_pixel;
-	int		line_length;
-	int		endian;
-	int		width;
-	int		height;
-	int		hitted;
-	unsigned long	frame;
-	unsigned		color_frame;
-	int		item;
-	int		now;
-	int		onetwo;
-	int		clear;
-	float	hp;
-
-	t_player	player;
-	t_player	player2;
-
-	t_player	bullet;
-	t_player	bullet2;
-
-	pthread_t	thread_right;
-	pthread_t	thread_left;
-
-	t_item		hill;
-	t_item		bomb;
-
-	// float	x;
-	// float	y;
-	// int		up;
-	// int		down;
-	// int		left;
-	// int		right;
-	int		m1;
-	int		m2;
-
-	// float	vec_x;
-	// float	vec_y;
-	// float	theta;
-	float	aim;
-	float	rotate_speed;
-	int		bullet_speed;
-}				t_data;
+#include "pixel_shooting_game.h"
 
 void	stage(t_data data);
 
@@ -501,11 +404,11 @@ void	moving(t_data *data, t_player *player)
 				//printf("player%d(%s) win!\n", player->num, player->charic);
 				//clear(data);
 			}
-			else if (arr[(int)(player->x * 10) + i][(int)(player->y * 10) + j] == 3)
+			else if (arr[(int)(player->x * 10) + i][(int)(player->y * 10) + j] == 3) // hill
 			{
 				if (player->HP <= 999.5)
 				{
-					player->HP += 0.07;
+					player->HP += 0.4;
 				}
 				data->hill.count++;
 				//printf("%d\n", data->hill.count);
@@ -513,9 +416,9 @@ void	moving(t_data *data, t_player *player)
 				//printf("player%d(%s) win!\n", player->num, player->charic);
 				//clear(data);
 			}
-			else if (arr[(int)(player->x * 10) + i][(int)(player->y * 10) + j] == 4)
+			else if (arr[(int)(player->x * 10) + i][(int)(player->y * 10) + j] == 4) // bomb
 			{
-				player->HP -= 0.3;
+				player->HP -= 0.06;
 				player->pcolor = 0xAFFF0000;
 				//printf("player%d(%s) win!\n", player->num, player->charic);
 				//clear(data);
@@ -937,6 +840,33 @@ void	hitted(t_data *data)
 	}
 }
 
+int		full_time(t_data *data)
+{
+	int full;
+	int first = 800;
+	int last = 250;
+
+	if (800 - data->frame / 10 < last)
+		full = last;
+	else
+		full = 800 - data->frame / 10;
+	return (full);
+}
+
+int		start_time(t_data *data)
+{
+	int		start;
+	int		first = 400;
+	int		last = 150;
+
+	if (550 - data->frame / 14 < last)
+		start = last;
+	else
+		start = 550 - data->frame / 14;
+
+	return start;
+}
+
 int		loop_ft(t_data *data)
 {
 	int		i;
@@ -968,14 +898,14 @@ int		loop_ft(t_data *data)
 	if (rand() % 20 > 18 && data->item == 0) // item
 	{
 		data->onetwo = rand() % 2;
-		data->now = data->frame + 800 - data->frame / 20;
+		data->now = data->frame + full_time(data);
 		data->item = 1;
 		if (data->onetwo == 1)
 			drop_item_ready(data);
 		else
 			drop_bomb_ready(data);
 	}
-	if (data->now < data->frame + 400 - data->frame / 40 && data->item != 0)
+	if (data->now < data->frame + start_time(data) && data->item != 0)
 	{
 		if (data->onetwo == 1)
 			drop_item(data);
@@ -991,6 +921,7 @@ int		loop_ft(t_data *data)
 		}
 		else
 			remove_item(data, &data->bomb);
+		printf("%d %d %d\n", full_time(data), start_time(data), full_time(data) - start_time(data));
 		data->item = 0;
 	}
 	
