@@ -691,31 +691,44 @@ void	blink(t_data data)
 		draw_hack(&data, &data.player2, 10, 0x00FF0000);
 }
 
-void	remove_item(t_data *data, t_item *item)
+void	remove_item(t_data *data, t_item *item, int H_B)
 {
-	int		ga = item->ga;
+	int		ga;
 	int		random_x = item->x;
 	int		random_y = item->y;
 
+	if (80 < data->frame / 40)
+		ga = item->ga + 80;
+	else
+		ga = item->ga + data->frame / 40;
 	for (int i = (-1) * ga; i < ga; i++) // circle
 	{
 		for (int j = (-1) * ga; j < ga; j++)
 		{
-			if ((i * i) + (j * j) <= ga * ga)
+			if (H_B == 1 && (i * i) + (j * j) <= ga * ga)
 			{
 				my_mlx_pixel_put(data, i + 200 + random_x, j + 200 + random_y, 0x00000000);
 				arr[i * 10 + 2000 + random_x * 10][j * 10 + 2000 + random_y * 10] = 0;
+			}
+			else if ((i * i) + (j * j) <= ga * ga)
+			{
+				my_mlx_pixel_put(data, i + 300 + random_x, j + 300 + random_y, 0x00000000);
+				arr[i * 10 + 3000 + random_x * 10][j * 10 + 3000 + random_y * 10] = 0;
 			}
 		}
 	}
 }
 
-void	drop_item_ready(t_data *data)
+void	drop_hill_ready(t_data *data)
 {
-	int		ga = data->hill.ga;
+	int		ga;
 	int		random_x = rand() % 600;
 	int		random_y = rand() % 400;
 
+	if (80 < data->frame / 40)
+		ga = data->hill.ga + 80;
+	else
+		ga = data->hill.ga + data->frame / 40;
 	data->hill.x = random_x;
 	data->hill.y = random_y;
 	for (int i = (-1) * ga; i < ga; i++) // circle
@@ -732,10 +745,14 @@ void	drop_item_ready(t_data *data)
 
 void	drop_bomb_ready(t_data *data)
 {
-	int		ga = data->bomb.ga;
-	int		random_x = rand() % 500;
-	int		random_y = rand() % 300;
+	int		ga;
+	int		random_x = rand() % 400;
+	int		random_y = rand() % 200;
 
+	if (80 < data->frame / 40)
+		ga = data->bomb.ga + 80;
+	else
+		ga = data->bomb.ga + data->frame / 40;
 	data->bomb.x = random_x;
 	data->bomb.y = random_y;
 	for (int i = (-1) * ga; i < ga; i++) // circle
@@ -744,7 +761,7 @@ void	drop_bomb_ready(t_data *data)
 		{
 			if ((i * i) + (j * j) <= ga * ga && (i * i) + (j * j) >= ga * ga - 200)
 			{
-				my_mlx_pixel_put(data, i + 200 + random_x, j + 200 + random_y, 0x00FF0000);
+				my_mlx_pixel_put(data, i + 300 + random_x, j + 300 + random_y, 0x00FF0000);
 			}
 		}
 	}
@@ -752,10 +769,14 @@ void	drop_bomb_ready(t_data *data)
 
 void	drop_item(t_data *data)
 {
-	int		ga = data->hill.ga;
+	int		ga;
 	int		random_x = data->hill.x;
 	int		random_y = data->hill.y;
 
+	if (80 < data->frame / 40)
+		ga = data->hill.ga + 80;
+	else
+		ga = data->hill.ga + data->frame / 40;
 	for (int i = (-1) * ga; i < ga; i++) // circle
 	{
 		for (int j = (-1) * ga; j < ga; j++)
@@ -779,18 +800,22 @@ void	drop_item(t_data *data)
 
 void	drop_bomb(t_data *data)
 {
-	int		ga = data->bomb.ga;
+	int		ga;
 	int		random_x = data->bomb.x;
 	int		random_y = data->bomb.y;
 
+	if (80 < data->frame / 40)
+		ga = data->bomb.ga + 80;
+	else
+		ga = data->bomb.ga + data->frame / 40;
 	for (int i = (-1) * ga; i < ga; i++) // circle
 	{
 		for (int j = (-1) * ga; j < ga; j++)
 		{
 			if ((i * i) + (j * j) <= ga * ga)
 			{
-				my_mlx_pixel_put(data, i + 200 + random_x, j + 200 + random_y, 0xFCAF0000);
-				arr[i * 10 + 2000 + random_x * 10][j * 10 + 2000 + random_y * 10] = 4;
+				my_mlx_pixel_put(data, i + 300 + random_x, j + 300 + random_y, 0xFCAF0000);
+				arr[i * 10 + 3000 + random_x * 10][j * 10 + 3000 + random_y * 10] = 4;
 			}
 		}
 	}
@@ -843,7 +868,6 @@ void	hitted(t_data *data)
 int		full_time(t_data *data)
 {
 	int full;
-	int first = 800;
 	int last = 250;
 
 	if (800 - data->frame / 10 < last)
@@ -856,13 +880,12 @@ int		full_time(t_data *data)
 int		start_time(t_data *data)
 {
 	int		start;
-	int		first = 400;
 	int		last = 150;
 
 	if (550 - data->frame / 14 < last)
 		start = last;
 	else
-		start = 550 - data->frame / 14;
+		start = 550 - data->frame / 13;
 
 	return start;
 }
@@ -901,7 +924,7 @@ int		loop_ft(t_data *data)
 		data->now = data->frame + full_time(data);
 		data->item = 1;
 		if (data->onetwo == 1)
-			drop_item_ready(data);
+			drop_hill_ready(data);
 		else
 			drop_bomb_ready(data);
 	}
@@ -916,11 +939,11 @@ int		loop_ft(t_data *data)
 	{
 		if (data->onetwo == 1)
 		{
-			remove_item(data, &data->hill); // data, x, y
+			remove_item(data, &data->hill, 1); // data, x, y
 			data->hill.count = 0;
 		}
 		else
-			remove_item(data, &data->bomb);
+			remove_item(data, &data->bomb, 0);
 		printf("%d %d %d\n", full_time(data), start_time(data), full_time(data) - start_time(data));
 		data->item = 0;
 	}
@@ -1028,7 +1051,7 @@ void	dataset(t_data *data)
 	data->bullet.count = 0;
 	data->bullet2.count = 0;
 
-	data->hill.ga = 30;
+	data->hill.ga = 45;
 	data->bomb.ga = 200;
 	data->hill.count = 0;
 }
