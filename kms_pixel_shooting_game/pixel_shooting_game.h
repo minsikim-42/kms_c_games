@@ -1,6 +1,6 @@
 #ifndef PIXEL_SHOOTING_GAME_H
 
-#include "mlx.h"
+#include "./mlx/mlx.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
@@ -69,6 +69,8 @@ typedef struct	s_data {
 	int		onetwo;
 	int		clear;
 	float	hp;
+
+	int		p2p;
 
 	t_player	player;
 	t_player	player2;

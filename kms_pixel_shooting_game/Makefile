@@ -1,20 +1,20 @@
-NAME = psg_v22.0
+NAME = psg_v22.1
 
 FILE = pixel_shooting_game2.c
 
 # CFLAGS = -Wall -Wextra -Werror unused
 
-MLXFLAGS = -lmlx -framework OpenGL -framework Appkit
-
+MLXFLAGS = -L./mlx -lmlx -framework OpenGL -framework Appkit
+# for Mac? : arch -x86_64
 OBJECT = $(FILE:.c=.o)
 
 all : $(NAME)
 
 $(NAME) : $(OBJECT)
-	gcc $(MLXFLAGS) -o $(NAME) $(FILE)
+	gcc -o $(NAME) $(FILE) $(MLXFLAGS)
 
 $(OBJECT) : $(FILE)
-	gcc $(MLXFLAGS) -c $(FILE)
+	gcc -c $(FILE) $(MLXFLAGS)
 
 clean :
 	rm -f $(OBJECT)

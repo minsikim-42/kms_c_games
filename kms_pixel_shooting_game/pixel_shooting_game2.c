@@ -901,8 +901,10 @@ int		loop_ft(t_data *data)
 	stage(*data);
 	moving(data, &data->player);
 	draw(data, &data->player, data->player.pcolor); // outside
-	moving(data, &data->player2);
-	draw(data, &data->player2, data->player2.pcolor); // outside
+	if (data->p2p == 2) {
+		moving(data, &data->player2);
+		draw(data, &data->player2, data->player2.pcolor); // outside //////////////
+	}
 	draw_things(data);
 	blink(*data);
 
@@ -1220,11 +1222,17 @@ void	stage(t_data data)
 	}
 }
 
-int		main()
+int		main(int argc, char *argv[])
 {
 	t_data	data;
 	t_data	image;
 
+	if (argc != 2)
+	{
+		printf("Invalid Error\n1p - 1\np2p - 2");
+		exit(0);
+	}
+	data.p2p = atoi(argv[1]);
 	dataset(&data);
 	data.mlx = mlx_init();
 	data.win = mlx_new_window(data.mlx, data.width, data.height, "minsikim_shooting");
