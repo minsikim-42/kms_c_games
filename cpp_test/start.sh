@@ -1,0 +1,1 @@
+c++ -I/opt/homebrew/Cellar/sfml/2.5.1_2/include/ -L/opt/homebrew/Cellar/sfml/2.5.1_2/lib/ -lsfml-audio -lsfml-graphics -lsfml-window -lsfml-system *.cpp
