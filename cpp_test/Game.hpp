@@ -10,15 +10,18 @@
 #include <ctime>
 #include <vector>
 #include <cmath>
+#include <sstream>
 // #include <random>
+#define ENEMY_COOL 6.f
+#define FPS 60
+#define HEIGHT 600
+#define WIDTH 800
 
 #include "Enemy.hpp"
 class Enemy;
 #include "Champ.hpp"
 class Champ;
 
-#define ENEMY_COOL 10.f
-#define FPS 60
 
 /*
 	class have to act as the game engine
@@ -40,15 +43,23 @@ private:
 	std::vector<Enemy>		enemies;
 	Enemy					enemy;
 	sf::RectangleShape		enemyShape;
+	Champ					*champ;
+
+	// game
 	float					spawnTime;
-	Champ					champ;
+	unsigned int			score;
+	bool					isOver;
+	bool					isCrush;
 
 	// game resource
 	sf::Font				font;
 
+	sf::Text				uiText;
+
 	void initWindow();
 	void initData();
 	void initFonts();
+	void initGame();
 
 public:
 	Game();
@@ -57,7 +68,10 @@ public:
 	void pollEvents();
 	void update();
 	void updateMousePos();
+	void updateUiText();
 	void render();
+	void renderUiText(sf::RenderTarget &target);
+	void gameOver();
 
 	void spawnEnemies();
 	void enemiesMove(); // enemy class

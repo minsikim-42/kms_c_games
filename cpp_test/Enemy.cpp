@@ -1,6 +1,6 @@
 #include "Enemy.hpp"
 
-Enemy::Enemy(): die(false) {
+Enemy::Enemy(): die(false), fallSpeed(1) {
 	std::cout << "ememy spawned!!\n";
 	this->shape.setPosition(
 		0.f, 0.f
@@ -21,15 +21,17 @@ const bool &Enemy::getDie() {
 	return this->die;
 }
 
-void Enemy::dropEnemy(float const &_y) {
-	sf::Vector2f po = this->shape.getPosition();
-	this->shape.setPosition(po.x, po.y + _y);
+void Enemy::dropEnemy() {
+	this->shape.move(0.f, this->fallSpeed);
 }
 void Enemy::setShape(sf::RectangleShape const &sh) { //
 	this->shape = sh;
 }
 void Enemy::setDie(const bool &d) {
 	this->die = d;
+}
+void Enemy::setFallSpeed(int speed) {
+	this->fallSpeed = speed;
 }
 
 const bool Enemy::checkIn(sf::Vector2f &po) {
@@ -39,6 +41,14 @@ const bool Enemy::checkIn(sf::Vector2f &po) {
 	else
 		return false;
 }
+const bool Enemy::isWindowOut(unsigned int const &height) {
+	if (this->shape.getPosition().y >= height) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
 void Enemy::draw(sf::RenderTarget &target) {
 	target.draw(this->shape);
 }

@@ -2,8 +2,8 @@
 
 // private
 void Game::initWindow() {
-	this->videoMode.width = 800;
-	this->videoMode.height = 600;
+	this->videoMode.width = WIDTH;
+	this->videoMode.height = HEIGHT;
 	this->window = new sf::RenderWindow(this->videoMode, "test", sf::Style::Titlebar | sf::Style::Close);
 
 	this->window->setFramerateLimit(FPS); // frame
@@ -11,20 +11,41 @@ void Game::initWindow() {
 void Game::initData() {
 	srand(static_cast<unsigned>(time(NULL)));
 	this->window = nullptr;
-
+}
+void Game::initGame() {
+	this->score = 0;
+	this->isOver = false;
+	this->isCrush = false;
+	this->champ->setHp(100);
 	this->spawnTime = ENEMY_COOL;
+	while (enemies.size() != 0) {
+		enemies.erase(enemies.begin());
+	}
+	this->enemies.clear();
 }
 void Game::initFonts() {
-	this->font.loadFromFile("./Fonts/test.ttf")
+	if (this->font.loadFromFile("Fonts/sansation.ttf") == false) {
+		std::cout << "Error::fail to get fonts\n";
+	} else {
+		this->uiText.setFont(this->font);
+		this->uiText.setCharacterSize(35);
+		this->uiText.setFillColor(sf::Color::White);
+		this->uiText.setString("NONE");
+	}
 }
 
 // public
 Game::Game() {
+	this->champ = new Champ(WIDTH, HEIGHT);
 	this->initData();
+	this->initGame();
 	this->initWindow();
+	this->initFonts();
+
 }
 Game::~Game() {
 	delete this->window;
+	delete this->champ;
 }
 
 void Game::updateMousePos() {
@@ -53,10 +74,15 @@ void Game::pollEvents() {
 }
 
 void Game::update() {
+	if (this->isOver == true) {
+		return ;
+	}
 	this->pollEvents();
 	this->updateMousePos();
-	this->champ.update();
+	this->champ->update();
+	this->updateUiText();
 
+	this->score++;
 	this->spawnTime -= 1.f;
 	if (this->spawnTime <= 0) {
 		this->spawnTime = ENEMY_COOL;
@@ -64,7 +90,7 @@ void Game::update() {
 	}
 
 	// std::cout << "mouse pos: " << sf::Mouse::getPosition().x << " " << sf::Mouse::getPosition().y << "\n";
-	std::cout << "mouse pos: " << this->mouse.x << " " << this->mouse.y << ", spTime: " << this->spawnTime << "\n";
+	// std::cout << "mouse pos: " << this->mouse.x << " " << this->mouse.y << ", spTime: " << this->spawnTime << "\n";
 }
 void Game::render() {
 	/*
@@ -72,42 +98,81 @@ void Game::render() {
 		render objects
 		display frame in window 
 	*/
-	this->window->clear(); // sf::Color(0xff, 0, 0, 0xff)
+	if (this->isOver == true) {
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) == true) {
+			this->isOver = false;
+		}
+	} else {
+		this->window->clear(); // sf::Color(0xff, 0, 0, 0xff)
 
-	// Draw game Object
-	for (int i=0; i < enemies.size(); i++) {
-		if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-			if (this->enemies[i].checkIn(this->mousePosView) == true) {
+		// Draw game Object
+		this->champ->draw(*this->window);
+		bool crushCount = false;
+		for (int i=0; i < enemies.size(); i++) {
+			if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+				if (this->enemies[i].checkIn(this->mousePosView) == true) {
+					this->enemies[i].setDie(true);
+				}
+			} else if (enemies[i].isWindowOut(this->window->getSize().y) == true) {
 				this->enemies[i].setDie(true);
-				continue;
 			}
+			if (this->champ->isDie() == true) {
+				this->gameOver();
+				this->isOver = true;
+				return;
+			} else if (this->champ->checkIn(enemies[i].getShape()) == true) {
+				this->champ->reduceHp(1);
+				crushCount = true;
+				this->champ->changeColor(sf::Color::Red);
+			}
+			// this->window->draw(enemies[i].getShape());
+			enemies[i].draw(*this->window);
 		}
-		if (this->champ.checkIn(enemies[i].getShape()) == true) {
-			this->champ.reduceHp(1);
+		if (crushCount == false) {
+			this->champ->changeColor(sf::Color::Cyan);
 		}
-		// this->window->draw(enemies[i].getShape());
-		enemies[i].draw(*this->window);
-	}
-	this->champ.draw(*this->window);
+		this->renderUiText(*this->window);
 
-	this->window->display();
+		this->window->display();
 
 
-	this->enemiesMove();
+		this->enemiesMove();
 
-	std::vector<Enemy>::iterator it = enemies.begin();
-	for (; it != enemies.end(); it++) {
-		if (it->getDie() == true) {
-			enemies.erase(it);
-			break ;
+		std::vector<Enemy>::iterator it = enemies.begin();
+		for (; it != enemies.end(); it++) {
+			if (it->getDie() == true) {
+				enemies.erase(it);
+				break ;
+			}
 		}
 	}
 }
+void Game::updateUiText() {
+	std::stringstream ss;
+
+	ss << "HP : " << this->champ->getHp() << "\nSCORE: " << this->score;
+
+	this->uiText.setString(ss.str());
+}
+void Game::renderUiText(sf::RenderTarget &target) {
+	target.draw(this->uiText);
+}
+
+void Game::gameOver() {
+	std::stringstream ss;
+	ss << "GAME OVER\nYour Score: " << this->score << "\n\nPress Space..";
+	this->uiText.setString(ss.str());
+	this->window->clear();
+	this->window->draw(this->uiText);
+	this->window->display();
+	this->initGame();
+}
+
 
 void Game::spawnEnemies() {
 	// static_cast<float>(rand() % static_cast<int>((this->window->getSize().y - this->enemyShape.getSize().y)))
 	this->enemyShape.setPosition(
-		static_cast<float>(rand() % static_cast<int>((this->window->getSize().x - this->enemyShape.getSize().x))),
+		static_cast<float>(rand() % static_cast<int>(this->window->getSize().x - this->enemyShape.getSize().x + 10)),
 		0.f
 	);
 	this->enemyShape.setFillColor(sf::Color::Red);
@@ -116,13 +181,14 @@ void Game::spawnEnemies() {
 	this->enemyShape.setOutlineColor(sf::Color::Magenta);
 	this->enemyShape.setOutlineThickness(5.f);
 	this->enemy.setShape(this->enemyShape);
+	this->enemy.setFallSpeed(rand() % 5 + 5);
 
 	this->enemies.push_back(this->enemy);
 }
 
 void Game::enemiesMove() { // enemy class
 	for (int i=0; i<this->enemies.size(); i++) {
-		this->enemies[i].dropEnemy(2);
+		this->enemies[i].dropEnemy();
 	}
 }
 

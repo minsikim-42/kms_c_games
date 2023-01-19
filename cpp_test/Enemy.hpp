@@ -9,6 +9,7 @@ class Enemy
 private:
 	float	spownTime;
 	bool	die;
+	int		fallSpeed;
 	sf::RectangleShape	shape;
 
 public:
@@ -17,11 +18,13 @@ public:
 	sf::RectangleShape const &getShape();
 	bool const	&getDie();
 
-	void dropEnemy(float const &_y);
+	void dropEnemy();
 	void setShape(sf::RectangleShape const &sh);
 	void setDie(const bool &die);
+	void setFallSpeed(int speed);
 
 	const bool checkIn(sf::Vector2f &po);
+	const bool isWindowOut(unsigned int const &height);
 	void draw(sf::RenderTarget &target);
 };
 

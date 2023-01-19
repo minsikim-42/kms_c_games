@@ -2,25 +2,40 @@
 # define CHAMP_HPP
 
 #include </opt/homebrew/Cellar/sfml/2.5.1_2/include/SFML/Graphics.hpp>
+#include <iostream>
 
 class Champ
 {
 private:
 	sf::RectangleShape	shape;
 	unsigned int		MaxHp;
-	unsigned int		Hp;
+	int					Hp;
+	unsigned			sizeW;
+	unsigned			sizeH;
+	unsigned			gameW;
+	unsigned			gameH;
+	float				frontLimit;
+	Champ();
+
+	//
 
 public:
-	Champ();
+	Champ(int wid, int hei, float sizeW = 24.f, float sizeH = 24.f);
 	~Champ();
 	void update();
 
 	sf::RectangleShape const &getShape();
+	const int getHp();
+	const bool isDie();
+
+	void setHp(unsigned int hp);
+	void changeColor(sf::Color color);
+
 	void draw(sf::RenderTarget &target);
 
 	void move(float x, float y);
 	void reduceHp(unsigned int deal);
-	bool checkIn(sf::Shape const &shape);
+	const bool checkIn(sf::Shape const &shape);
 };
 
 #endif
