@@ -14,14 +14,20 @@
 // #include <random>
 #define ENEMY_COOL 6.f
 #define FPS 60
-#define HEIGHT 600
-#define WIDTH 800
+#define WIDTH 1024
+#define HEIGHT 800
 
 #include "Enemy.hpp"
-class Enemy;
+// class Enemy;
 #include "Champ.hpp"
 class Champ;
 
+enum ENUMTYPE
+{
+	DEFAULT = 0,
+	TYPE1 = 1,
+	TYPE2 = 2
+};
 
 /*
 	class have to act as the game engine
@@ -40,9 +46,14 @@ private:
 	sf::Vector2f			mousePosView;
 
 	// game object
-	std::vector<Enemy>		enemies;
-	Enemy					enemy;
+	std::vector<Enemy<sf::RectangleShape> >		enemies;
+	Enemy<sf::RectangleShape>					enemy;
+	// Enemy<sf::ConvexShape>					CONVEXenemy; // error
+	// std::vector<Enemy<sf::CircleShape> >		SIRCLEenemies;
+	// Enemy<sf::CircleShape>					SIRCLEenemy;
+
 	sf::RectangleShape		enemyShape;
+
 	Champ					*champ;
 
 	// game
@@ -53,12 +64,14 @@ private:
 
 	// game resource
 	sf::Font				font;
-
 	sf::Text				uiText;
+	sf::Texture				texture;
+	sf::Sprite				space;
 
 	void initWindow();
 	void initData();
 	void initFonts();
+	void initSpace();
 	void initGame();
 
 public:
@@ -69,6 +82,7 @@ public:
 	void update();
 	void updateMousePos();
 	void updateUiText();
+	void updateSpace();
 	void render();
 	void renderUiText(sf::RenderTarget &target);
 	void gameOver();

@@ -1,13 +1,24 @@
 #include "Champ.hpp"
 
 Champ::Champ(int wid, int hei, float sizeW, float sizeH):
-	MaxHp(100), Hp(100), gameW(wid), gameH(hei), frontLimit((hei * 3) / 4)
+	MaxHp(10), Hp(10), gameW(wid), gameH(hei), frontLimit((hei * 3) / 4)
 {
+	if (this->texture.loadFromFile("Textures/spaceship.png") == false) {
+		std::cout << "Fail to load Champ texture\n";
+		exit(1);
+	}
+	this->sprite.setTexture(this->texture);
+	this->sprite.setScale(0.15f, 0.15f);
+	this->originColor = this->sprite.getColor();
+	sf::FloatRect sp = this->sprite.getLocalBounds();
+	this->sprite.setPosition(
+		(wid - sp.width * sprite.getScale().x + sizeW) / 2, ((hei - sp.height * sprite.getScale().y + sizeH) * 4) / 5
+	);
+
 	this->shape.setPosition(
 		wid / 2, (hei * 4) / 5
 	);
 	this->shape.setSize(sf::Vector2f(sizeW, sizeH));
-	// this->shape.setScale(sf::Vector2f(0.5f, 0.5f)); // size 1/2 ** attention to move
 	this->shape.setFillColor(sf::Color::Cyan);
 	this->shape.setOutlineColor(sf::Color::Green);
 	this->shape.setOutlineThickness(10.f);
@@ -38,15 +49,24 @@ const bool Champ::isDie() {
 		return false;
 	}
 }
+const sf::Color &Champ::getOriginColor() {
+	return this->originColor;
+}
 
 void Champ::setHp(unsigned int hp) {
-	this->Hp = hp;
+	if (hp >= this->MaxHp) {
+		this->Hp = this->MaxHp;
+	} else {
+		this->Hp = hp;
+	}
 }
 void Champ::changeColor(sf::Color color) {
 	this->shape.setFillColor(color);
+	this->sprite.setColor(color);
 }
 void Champ::draw(sf::RenderTarget &target) {
-	target.draw(this->shape);
+	// target.draw(this->shape);
+	target.draw(this->sprite);
 }
 
 void Champ::move(float x, float y) {
@@ -56,6 +76,7 @@ void Champ::move(float x, float y) {
 		this->shape.getPosition().y + y > this->frontLimit) // ^
 	{
 		this->shape.move(x, y);
+		this->sprite.move(x, y);
 	}
 }
 void Champ::reduceHp(unsigned int deal) {

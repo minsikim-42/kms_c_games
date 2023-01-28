@@ -15,6 +15,11 @@ private:
 	unsigned			gameW;
 	unsigned			gameH;
 	float				frontLimit;
+
+	sf::Texture			texture;
+	sf::Sprite			sprite;
+	sf::Color			originColor;
+
 	Champ();
 
 	//
@@ -26,6 +31,7 @@ public:
 
 	sf::RectangleShape const &getShape();
 	const int getHp();
+	const sf::Color &getOriginColor();
 	const bool isDie();
 
 	void setHp(unsigned int hp);

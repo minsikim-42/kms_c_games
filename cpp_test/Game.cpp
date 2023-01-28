@@ -26,11 +26,28 @@ void Game::initGame() {
 void Game::initFonts() {
 	if (this->font.loadFromFile("Fonts/sansation.ttf") == false) {
 		std::cout << "Error::fail to get fonts\n";
+		exit(1);
 	} else {
 		this->uiText.setFont(this->font);
 		this->uiText.setCharacterSize(35);
 		this->uiText.setFillColor(sf::Color::White);
 		this->uiText.setString("NONE");
+	}
+}
+void Game::initSpace() {
+	if (this->texture.loadFromFile("Textures/Space.png") == false) {
+		std::cout << "Error::fail to get space\n";
+		exit(1);
+	} else {
+		this->space.setTexture(this->texture);
+		// this->space.setScale(1.5f, 1.5f);
+		// this->space.setRotation(90.f);
+		sf::FloatRect FR = this->space.getLocalBounds();
+		// this->space.setPosition(WIDTH / 2, HEIGHT - FR.height * this->space.getScale().y);
+		this->space.setPosition(
+			(WIDTH - FR.width * this->space.getScale().x) / 2,
+			-FR.height * this->space.getScale().y / 2
+		);
 	}
 }
 
@@ -41,18 +58,13 @@ Game::Game() {
 	this->initGame();
 	this->initWindow();
 	this->initFonts();
-
+	this->initSpace();
 }
 Game::~Game() {
 	delete this->window;
 	delete this->champ;
 }
 
-void Game::updateMousePos() {
-	this->mouse = sf::Mouse::getPosition(*this->window);
-
-	this->mousePosView = this->window->mapPixelToCoords(this->mouse);
-}
 
 void Game::pollEvents() {
 	while (this->window->pollEvent(this->ev)) {
@@ -73,6 +85,11 @@ void Game::pollEvents() {
 	}
 }
 
+void Game::updateMousePos() {
+	this->mouse = sf::Mouse::getPosition(*this->window);
+
+	this->mousePosView = this->window->mapPixelToCoords(this->mouse);
+}
 void Game::update() {
 	if (this->isOver == true) {
 		return ;
@@ -81,6 +98,7 @@ void Game::update() {
 	this->updateMousePos();
 	this->champ->update();
 	this->updateUiText();
+	this->updateSpace();
 
 	this->score++;
 	this->spawnTime -= 1.f;
@@ -106,6 +124,7 @@ void Game::render() {
 		this->window->clear(); // sf::Color(0xff, 0, 0, 0xff)
 
 		// Draw game Object
+		this->window->draw(this->space);
 		this->champ->draw(*this->window);
 		bool crushCount = false;
 		for (int i=0; i < enemies.size(); i++) {
@@ -129,7 +148,7 @@ void Game::render() {
 			enemies[i].draw(*this->window);
 		}
 		if (crushCount == false) {
-			this->champ->changeColor(sf::Color::Cyan);
+			this->champ->changeColor(this->champ->getOriginColor());
 		}
 		this->renderUiText(*this->window);
 
@@ -138,7 +157,7 @@ void Game::render() {
 
 		this->enemiesMove();
 
-		std::vector<Enemy>::iterator it = enemies.begin();
+		std::vector<Enemy<sf::RectangleShape> >::iterator it = enemies.begin();
 		for (; it != enemies.end(); it++) {
 			if (it->getDie() == true) {
 				enemies.erase(it);
@@ -152,7 +171,19 @@ void Game::updateUiText() {
 
 	ss << "HP : " << this->champ->getHp() << "\nSCORE: " << this->score;
 
+	this->uiText.setPosition(0.f, 0.f);
 	this->uiText.setString(ss.str());
+}
+void Game::updateSpace() {
+	sf::FloatRect FR = this->space.getLocalBounds();
+	if (this->space.getPosition().y >= 0) {
+		sf::FloatRect FR = this->space.getLocalBounds();
+		this->space.setPosition(
+			(WIDTH - FR.width * this->space.getScale().x) / 2,
+			-FR.height * this->space.getScale().y / 2
+		);
+	}
+	this->space.move(0.f, 0.3f);
 }
 void Game::renderUiText(sf::RenderTarget &target) {
 	target.draw(this->uiText);
@@ -162,6 +193,8 @@ void Game::gameOver() {
 	std::stringstream ss;
 	ss << "GAME OVER\nYour Score: " << this->score << "\n\nPress Space..";
 	this->uiText.setString(ss.str());
+	sf::FloatRect bounds = this->uiText.getLocalBounds();
+	this->uiText.setPosition((WIDTH - bounds.width) / 2, (HEIGHT - bounds.height) / 2);
 	this->window->clear();
 	this->window->draw(this->uiText);
 	this->window->display();
@@ -171,17 +204,8 @@ void Game::gameOver() {
 
 void Game::spawnEnemies() {
 	// static_cast<float>(rand() % static_cast<int>((this->window->getSize().y - this->enemyShape.getSize().y)))
-	this->enemyShape.setPosition(
-		static_cast<float>(rand() % static_cast<int>(this->window->getSize().x - this->enemyShape.getSize().x + 10)),
-		0.f
-	);
-	this->enemyShape.setFillColor(sf::Color::Red);
-	this->enemyShape.setSize(sf::Vector2f(70.f, 70.f));
-	this->enemyShape.setScale(sf::Vector2f(0.5f, 0.5f));
-	this->enemyShape.setOutlineColor(sf::Color::Magenta);
-	this->enemyShape.setOutlineThickness(5.f);
-	this->enemy.setShape(this->enemyShape);
-	this->enemy.setFallSpeed(rand() % 5 + 5);
+	int R = rand();
+	this->enemy.setEnemy(35.f, 35.f, this->window->getSize().x);
 
 	this->enemies.push_back(this->enemy);
 }
