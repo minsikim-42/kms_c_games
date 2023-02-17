@@ -4,6 +4,8 @@
 #include </opt/homebrew/Cellar/sfml/2.5.1_2/include/SFML/Graphics.hpp>
 #include <iostream>
 
+#include "Bullet.hpp"
+
 class Champ
 {
 private:
@@ -15,6 +17,7 @@ private:
 	unsigned			gameW;
 	unsigned			gameH;
 	float				frontLimit;
+	std::vector<Bullet *> bullets;
 
 	sf::Texture			texture;
 	sf::Sprite			sprite;
@@ -32,6 +35,7 @@ public:
 	sf::RectangleShape const &getShape();
 	const int getHp();
 	const sf::Color &getOriginColor();
+	const std::vector<Bullet *> getBullets(); // 이러면 private 쓰는 의미가 있을까?
 	const bool isDie();
 
 	void setHp(unsigned int hp);
@@ -40,8 +44,11 @@ public:
 	void draw(sf::RenderTarget &target);
 
 	void move(float x, float y);
-	void reduceHp(unsigned int deal);
+	void reduceHp(int deal);
 	const bool checkIn(sf::Shape const &shape);
+	const bool checkInBullet(sf::Shape const &shape);
+	void checkBulletOut();
+	void fire();
 };
 
 #endif

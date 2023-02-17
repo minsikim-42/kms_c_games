@@ -40,7 +40,7 @@ void Game::initSpace() {
 		exit(1);
 	} else {
 		this->space.setTexture(this->texture);
-		// this->space.setScale(1.5f, 1.5f);
+		this->space.setScale(1.5f, 1.5f);
 		// this->space.setRotation(90.f);
 		sf::FloatRect FR = this->space.getLocalBounds();
 		// this->space.setPosition(WIDTH / 2, HEIGHT - FR.height * this->space.getScale().y);
@@ -52,7 +52,7 @@ void Game::initSpace() {
 }
 
 // public
-Game::Game() {
+Game::Game(): isHome(true) {
 	this->champ = new Champ(WIDTH, HEIGHT);
 	this->initData();
 	this->initGame();
@@ -72,11 +72,14 @@ void Game::pollEvents() {
 		{
 		case sf::Event::Closed:
 			this->window->close();
+			system("leaks a.out");
 			break;
 		
 		case sf::Event::KeyPressed:
 			if (this->ev.key.code == sf::Keyboard::Escape)
 				this->window->close();
+			else if (this->ev.key.code == sf::Keyboard::Z)
+				this->champ->fire();
 			break;
 
 		default:
@@ -100,11 +103,13 @@ void Game::update() {
 	this->updateUiText();
 	this->updateSpace();
 
-	this->score++;
-	this->spawnTime -= 1.f;
-	if (this->spawnTime <= 0) {
-		this->spawnTime = ENEMY_COOL;
-		this->spawnEnemies();
+	if (this->isHome == false) {
+		this->score++;
+		this->spawnTime -= 1.f;
+		if (this->spawnTime <= 0) {
+			this->spawnTime = ENEMY_COOL;
+			this->spawnEnemies();
+		}
 	}
 
 	// std::cout << "mouse pos: " << sf::Mouse::getPosition().x << " " << sf::Mouse::getPosition().y << "\n";
@@ -116,7 +121,9 @@ void Game::render() {
 		render objects
 		display frame in window 
 	*/
-	if (this->isOver == true) {
+	if (this->isHome == true) {
+		renderHome();
+	} else if (this->isOver == true) {
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) == true) {
 			this->isOver = false;
 		}
@@ -132,7 +139,8 @@ void Game::render() {
 				if (this->enemies[i].checkIn(this->mousePosView) == true) {
 					this->enemies[i].setDie(true);
 				}
-			} else if (enemies[i].isWindowOut(this->window->getSize().y) == true) {
+			} else if (enemies[i].isWindowOut(this->window->getSize().y) == true ||
+						enemies[i].getHp() <= 0) {
 				this->enemies[i].setDie(true);
 			}
 			if (this->champ->isDie() == true) {
@@ -140,9 +148,18 @@ void Game::render() {
 				this->isOver = true;
 				return;
 			} else if (this->champ->checkIn(enemies[i].getShape()) == true) {
-				this->champ->reduceHp(1);
-				crushCount = true;
-				this->champ->changeColor(sf::Color::Red);
+				if (enemies[i].getType() == true) {
+					this->champ->reduceHp(1);
+					crushCount = true;
+					this->champ->changeColor(sf::Color::Red);
+				} else {
+					enemies[i].setDie(true);
+					this->champ->reduceHp(-5);
+				}
+			}
+			if (this->champ->checkInBullet(enemies[i].getShape()) == true) {
+				// removed bullet
+				this->enemies[i].reduceHp(2);
 			}
 			// this->window->draw(enemies[i].getShape());
 			enemies[i].draw(*this->window);
@@ -150,6 +167,7 @@ void Game::render() {
 		if (crushCount == false) {
 			this->champ->changeColor(this->champ->getOriginColor());
 		}
+		
 		this->renderUiText(*this->window);
 
 		this->window->display();
@@ -159,11 +177,27 @@ void Game::render() {
 
 		std::vector<Enemy<sf::RectangleShape> >::iterator it = enemies.begin();
 		for (; it != enemies.end(); it++) {
-			if (it->getDie() == true) {
+			if (it->isDie() == true) {
 				enemies.erase(it);
 				break ;
 			}
 		}
+	}
+}
+void Game::renderHome() {
+	std::stringstream ss;
+
+	ss << "START\nSOMETHING";
+
+	this->uiText.setPosition(0.f, 0.f);
+	this->uiText.setString(ss.str());
+	sf::FloatRect bounds = this->uiText.getLocalBounds();
+	this->uiText.setPosition((WIDTH - bounds.width) / 2, (HEIGHT - bounds.height) / 2);
+	this->window->clear();
+	this->window->draw(this->uiText);
+	this->window->display();
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
+		this->isHome = false;
 	}
 }
 void Game::updateUiText() {
@@ -183,7 +217,7 @@ void Game::updateSpace() {
 			-FR.height * this->space.getScale().y / 2
 		);
 	}
-	this->space.move(0.f, 0.3f);
+	this->space.move(0.f, 0.8f);
 }
 void Game::renderUiText(sf::RenderTarget &target) {
 	target.draw(this->uiText);

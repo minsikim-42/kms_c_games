@@ -12,10 +12,10 @@
 #include <cmath>
 #include <sstream>
 // #include <random>
-#define ENEMY_COOL 6.f
+#define ENEMY_COOL 8.f
 #define FPS 60
-#define WIDTH 1024
-#define HEIGHT 800
+#define WIDTH 1280
+#define HEIGHT 1024
 
 #include "Enemy.hpp"
 // class Enemy;
@@ -61,6 +61,7 @@ private:
 	unsigned int			score;
 	bool					isOver;
 	bool					isCrush;
+	bool					isHome;
 
 	// game resource
 	sf::Font				font;
@@ -85,6 +86,7 @@ public:
 	void updateSpace();
 	void render();
 	void renderUiText(sf::RenderTarget &target);
+	void renderHome();
 	void gameOver();
 
 	void spawnEnemies();
