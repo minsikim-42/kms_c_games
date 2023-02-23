@@ -4,7 +4,7 @@
 #include </opt/homebrew/Cellar/sfml/2.5.1_2/include/SFML/Graphics.hpp>
 #include <iostream>
 
-#define BULLETSPEED 10.f
+#define BULLETSPEED 15.f
 
 class Bullet
 {

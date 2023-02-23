@@ -16,12 +16,15 @@ void Game::initGame() {
 	this->score = 0;
 	this->isOver = false;
 	this->isCrush = false;
-	this->champ->setHp(100);
+	this->homeNum = 0;
 	this->spawnTime = ENEMY_COOL;
 	while (enemies.size() != 0) {
 		enemies.erase(enemies.begin());
 	}
 	this->enemies.clear();
+
+	this->champ->setXY((WIDTH) / 2, ((HEIGHT) * 4) / 5);
+	this->champ->cleanBullet();
 }
 void Game::initFonts() {
 	if (this->font.loadFromFile("Fonts/sansation.ttf") == false) {
@@ -52,7 +55,7 @@ void Game::initSpace() {
 }
 
 // public
-Game::Game(): isHome(true) {
+Game::Game(): isHome(true),  highScore(0) {
 	this->champ = new Champ(WIDTH, HEIGHT);
 	this->initData();
 	this->initGame();
@@ -78,8 +81,6 @@ void Game::pollEvents() {
 		case sf::Event::KeyPressed:
 			if (this->ev.key.code == sf::Keyboard::Escape)
 				this->window->close();
-			else if (this->ev.key.code == sf::Keyboard::Z)
-				this->champ->fire();
 			break;
 
 		default:
@@ -97,11 +98,6 @@ void Game::update() {
 	if (this->isOver == true) {
 		return ;
 	}
-	this->pollEvents();
-	this->updateMousePos();
-	this->champ->update();
-	this->updateUiText();
-	this->updateSpace();
 
 	if (this->isHome == false) {
 		this->score++;
@@ -110,6 +106,11 @@ void Game::update() {
 			this->spawnTime = ENEMY_COOL;
 			this->spawnEnemies();
 		}
+		this->pollEvents();
+		this->updateMousePos();
+		this->champ->update();
+		this->updateUiText();
+		this->updateSpace();
 	}
 
 	// std::cout << "mouse pos: " << sf::Mouse::getPosition().x << " " << sf::Mouse::getPosition().y << "\n";
@@ -123,9 +124,11 @@ void Game::render() {
 	*/
 	if (this->isHome == true) {
 		renderHome();
+		return ;
 	} else if (this->isOver == true) {
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) == true) {
 			this->isOver = false;
+			this->isHome = true;
 		}
 	} else {
 		this->window->clear(); // sf::Color(0xff, 0, 0, 0xff)
@@ -187,17 +190,39 @@ void Game::render() {
 void Game::renderHome() {
 	std::stringstream ss;
 
-	ss << "START\nSOMETHING";
+	ss << "START\nEXIT";
 
 	this->uiText.setPosition(0.f, 0.f);
 	this->uiText.setString(ss.str());
 	sf::FloatRect bounds = this->uiText.getLocalBounds();
-	this->uiText.setPosition((WIDTH - bounds.width) / 2, (HEIGHT - bounds.height) / 2);
+	this->uiText.setPosition((WIDTH - bounds.width - 50) / 2, (HEIGHT - bounds.height) / 2);
+	sf::CircleShape	dot;
+	dot.setRadius(10);
+	dot.setOrigin(dot.getRadius() / 2.f, dot.getRadius() / 2.f);
+	if (this->homeNum == 0) {
+		sf::Vector2f v((WIDTH + bounds.width + 50) / 2, (HEIGHT - bounds.height / 2) / 2);
+		dot.setPosition(v);
+	} else if (this->homeNum == 1) {
+		sf::Vector2f v((WIDTH + bounds.width + 50) / 2, (HEIGHT + bounds.height / 2 + 20) / 2);
+		dot.setPosition(v);
+	}
+
 	this->window->clear();
 	this->window->draw(this->uiText);
+	this->window->draw(dot);
 	this->window->display();
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-		this->isHome = false;
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) ||
+		sf::Keyboard::isKeyPressed(sf::Keyboard::Z)) {
+		if (this->homeNum == 0) {
+			this->isHome = false;
+		} else if (this->homeNum == 1) {
+			exit(0);
+		}
+	} else if (this->homeNum == 0 && sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
+		this->homeNum = 1;
+	} else if (this->homeNum == 1 && sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
+		this->homeNum = 0;
 	}
 }
 void Game::updateUiText() {
@@ -224,8 +249,11 @@ void Game::renderUiText(sf::RenderTarget &target) {
 }
 
 void Game::gameOver() {
+	if (this->score > this->highScore) {
+		this->highScore = this->score;
+	}
 	std::stringstream ss;
-	ss << "GAME OVER\nYour Score: " << this->score << "\n\nPress Space..";
+	ss << "GAME OVER\nYour Score: " << this->score << "\n\nHIGH Score: " << this->highScore << "\n\nPress Space..";
 	this->uiText.setString(ss.str());
 	sf::FloatRect bounds = this->uiText.getLocalBounds();
 	this->uiText.setPosition((WIDTH - bounds.width) / 2, (HEIGHT - bounds.height) / 2);
@@ -233,6 +261,7 @@ void Game::gameOver() {
 	this->window->draw(this->uiText);
 	this->window->display();
 	this->initGame();
+	this->champ->reset();
 }
 
 

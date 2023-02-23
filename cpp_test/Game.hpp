@@ -59,9 +59,11 @@ private:
 	// game
 	float					spawnTime;
 	unsigned int			score;
+	unsigned int			highScore;
 	bool					isOver;
 	bool					isCrush;
 	bool					isHome;
+	uint8_t					homeNum;
 
 	// game resource
 	sf::Font				font;

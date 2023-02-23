@@ -6,6 +6,8 @@
 
 #include "Bullet.hpp"
 
+#define COOLTIME 10
+
 class Champ
 {
 private:
@@ -18,6 +20,7 @@ private:
 	unsigned			gameH;
 	float				frontLimit;
 	std::vector<Bullet *> bullets;
+	unsigned			bulletCool;
 
 	sf::Texture			texture;
 	sf::Sprite			sprite;
@@ -39,7 +42,9 @@ public:
 	const bool isDie();
 
 	void setHp(unsigned int hp);
+	void setXY(float x, float y);
 	void changeColor(sf::Color color);
+	void cleanBullet();
 
 	void draw(sf::RenderTarget &target);
 
@@ -49,6 +54,7 @@ public:
 	const bool checkInBullet(sf::Shape const &shape);
 	void checkBulletOut();
 	void fire();
+	void reset();
 };
 
 #endif
