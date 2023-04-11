@@ -4,6 +4,9 @@ please git clone, and you can play before `chmod 777 (virsion)`, and `./(virsion
 
 you can play only Mac! (M1 OK!)
 
+<img width="1077" alt="pgsScreenShot" src="https://user-images.githubusercontent.com/74590585/231181813-b9f876db-8c56-4e81-875d-e22b93958d1e.png">
+
+
 ### P1 Key
 - right: d
 - left: a
