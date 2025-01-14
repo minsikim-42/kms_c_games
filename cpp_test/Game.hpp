@@ -1,11 +1,13 @@
 #ifndef GAME_HPP
 #define GAME_HPP
 
-#include </opt/homebrew/Cellar/sfml/2.5.1_2/include/SFML/Graphics.hpp>
-#include </opt/homebrew/Cellar/sfml/2.5.1_2/include/SFML/Audio.hpp>
-#include </opt/homebrew/Cellar/sfml/2.5.1_2/include/SFML/Network.hpp>
-#include </opt/homebrew/Cellar/sfml/2.5.1_2/include/SFML/System.hpp>
-#include </opt/homebrew/Cellar/sfml/2.5.1_2/include/SFML/Window.hpp>
+//#include </opt/homebrew/Cellar/sfml/2.5.1_2/include/SFML/Graphics.hpp>
+//#include </opt/homebrew/Cellar/sfml/2.5.1_2/include/SFML/Audio.hpp>
+//#include </opt/homebrew/Cellar/sfml/2.5.1_2/include/SFML/Network.hpp>
+//#include </opt/homebrew/Cellar/sfml/2.5.1_2/include/SFML/System.hpp>
+//#include </opt/homebrew/Cellar/sfml/2.5.1_2/include/SFML/Window.hpp>
+#include <SFML/Graphics.hpp>
+
 #include <iostream>
 #include <ctime>
 #include <vector>

@@ -1,7 +1,9 @@
 #ifndef CHAMP_HPP
 # define CHAMP_HPP
 
-#include </opt/homebrew/Cellar/sfml/2.5.1_2/include/SFML/Graphics.hpp>
+//#include </opt/homebrew/Cellar/sfml/2.5.1_2/include/SFML/Graphics.hpp>
+#include <SFML/Graphics.hpp>
+
 #include <iostream>
 
 #include "Bullet.hpp"
