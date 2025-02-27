@@ -1,4 +1,4 @@
-### SFML Shooting Game(2023.1)
+### SFML Simple Shooting Game(2023.1)
 
 ![image](https://github.com/user-attachments/assets/1d70661b-48ee-49ea-9cb1-37c335a68549)
 
