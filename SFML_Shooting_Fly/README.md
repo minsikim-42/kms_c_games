@@ -1,6 +1,6 @@
 ### Build
 
-**환경: In Mac M1**
+**환경: Mac M1**
 
 brew install sfml@2
 
